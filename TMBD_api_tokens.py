@@ -84,7 +84,7 @@ def main():
             print(f"  {key}: {value}")
             
     except requests.HTTPError as http_err:
-        print(f"HTTP error occurred: {http_err}")
+        print(f"An HTTP error occurred: {http_err}")
     except Exception as e:
         print(f"An error occurred: {e}")
 
