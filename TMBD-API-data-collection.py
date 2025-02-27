@@ -46,6 +46,7 @@ while len(reviews) < 500:
     # For each movie, get its reviews.
     for movie in movie_results:
         movie_id = movie["id"]
+        movie_title = movie.get("title", "Unknown Title")
         reviews_url = f"https://api.themoviedb.org/3/movie/{movie_id}/reviews"
         reviews_params = {"api_key": API_KEY}
         reviews_response = requests.get(reviews_url, params=reviews_params)
@@ -56,40 +57,47 @@ while len(reviews) < 500:
 
         reviews_data = reviews_response.json()
         movie_reviews = reviews_data.get("results", [])
-        reviews.extend(movie_reviews)
-
-        # Stop if we have reached (or exceeded) 500 reviews.
+        for review in movie_reviews:
+            # Get the written review content.
+            written_review = review.get("content", "")
+            # Count the number of words in the review.
+            word_count = len(written_review.split())
+            # Filter reviews: more than 10 words and fewer than 150 words.
+            if word_count > 10 and word_count < 150:
+                # Attach the movie_id and movie_title to the review.
+                review["movie_id"] = movie_id
+                review["movie_title"] = movie_title
+                reviews.append(review)
+            if len(reviews) >= 500:
+                reviews = reviews[:500]  # Trim to exactly 500 if necessary.
+                break
         if len(reviews) >= 500:
-            reviews = reviews[:500]  # Trim to exactly 500 if needed.
             break
 
-    # Prepare to fetch the next page of movies.
     movie_page += 1
-    # If we've gone past the total available pages, exit the loop.
     if movie_page > movies_data.get("total_pages", 1):
         break
 
-print(f"Collected {len(reviews)} reviews")
-# Optionally, process the reviews as needed
+print(f"Collected {len(reviews)} reviews that meet the criteria.")
 
-# compile this list into a format easily usable for machine learning models to train on
+# Step 3: Put the collected data into a pandas DataFrame.
+# Each row contains the movie_id, movie_title, rating (if available), and the written review.
 review_data = []
 for review in reviews:
-    movie_id = review.get('movie_id')
-    # The rating is nested inside the 'author_details' key (it might be None)
-    rating = review.get('author_details', {}).get('rating')
-    written_review = review.get('content')
-    
+    movie_id = review.get("movie_id")
+    movie_title = review.get("movie_title")
+    # Extract rating from the nested 'author_details'; it may be None.
+    rating = review.get("author_details", {}).get("rating")
+    written_review = review.get("content")
     review_data.append({
-        'movie_id': movie_id,
-        'rating': rating,
-        'review': written_review
+        "movie_id": movie_id,
+        "movie_title": movie_title,
+        "rating": rating,
+        "review": written_review
     })
 
-# Create a DataFrame with the extracted data.
 df_reviews = pd.DataFrame(review_data)
-
-# Display the first few rows of the DataFrame.
+df_reviews = df_reviews.dropna(subset=["rating"])
 print(df_reviews.head())
 
 # end of script
