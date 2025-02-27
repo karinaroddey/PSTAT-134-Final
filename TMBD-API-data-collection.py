@@ -100,4 +100,7 @@ df_reviews = pd.DataFrame(review_data)
 df_reviews = df_reviews.dropna(subset=["rating"])
 print(df_reviews.head())
 
+df_reviews.to_csv("df_reviews.csv", index=False)
+print("DataFrame saved as 'df_reviews.csv' in the current directory.")
+
 # end of script
