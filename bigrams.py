@@ -141,15 +141,15 @@ def plot_bigram_graph(bigram_list, top_n=10, title="Bigrams Graph"):
 # Plot top 10 bigrams for GOOD reviews
 plot_bigram_graph(
     bigram_list=good_bigram_freq_sorted,
-    top_n=20,
-    title="Top 10 Bigrams (Good Reviews)"
+    top_n=15,
+    title="Top 15 Bigrams (Good Reviews)"
 )
 
 # Plot top 10 bigrams for BAD reviews
 plot_bigram_graph(
     bigram_list=bad_bigram_freq_sorted,
-    top_n=20,
-    title="Top 10 Bigrams (Bad Reviews)"
+    top_n=15,
+    title="Top 15 Bigrams (Bad Reviews)"
 )
 
 # pretty much works but could use some tweaking
